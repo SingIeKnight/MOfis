@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using MOfis.Common;
+using MOfis.Sheet;
 using MOfis.Writer;
 
 namespace MOfis.Shell;
@@ -32,6 +33,12 @@ public partial class StartWindow : Window
     private void NewDocument_Click(object sender, RoutedEventArgs e)
     {
         AppActions.NewDocument();
+        Close();
+    }
+
+    private void NewSheet_Click(object sender, RoutedEventArgs e)
+    {
+        AppActions.NewSheet();
         Close();
     }
 
@@ -120,12 +127,26 @@ public partial class StartWindow : Window
 
         open.Click += (_, _) =>
         {
-            var win = new WriterWindow();
-            if (win.LoadRecovery(r))
+            Window win;
+            bool ok;
+            if (r.IsSheet)
+            {
+                var sw = new SheetWindow();
+                ok = sw.LoadRecovery(r);
+                win = sw;
+            }
+            else
+            {
+                var ww = new WriterWindow();
+                ok = ww.LoadRecovery(r);
+                win = ww;
+            }
+            if (ok)
             {
                 win.Show();
                 Close();
             }
+            else win.Close();
         };
         discard.Click += (_, _) =>
         {

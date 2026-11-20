@@ -1,5 +1,6 @@
 using System.Windows;
 using Microsoft.Win32;
+using MOfis.Sheet;
 using MOfis.Writer;
 
 namespace MOfis.Common;
@@ -15,6 +16,11 @@ public static class AppActions
     public static void NewDocument()
     {
         new WriterWindow().Show();
+    }
+
+    public static void NewSheet()
+    {
+        new SheetWindow().Show();
     }
 
     public static void ShowOpenDialog(Window? owner)
@@ -64,8 +70,14 @@ public static class AppActions
 
         if (IsSheetFile(path))
         {
-            MessageBox.Show("Hesap tablosu bir sonraki sürümde geliyor.", AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Information);
-            return false;
+            var win = new SheetWindow();
+            if (!win.LoadFile(path))
+            {
+                win.Close();
+                return false;
+            }
+            win.Show();
+            return true;
         }
 
         MessageBox.Show("Bu dosya türü desteklenmiyor.", AppInfo.Name, MessageBoxButton.OK, MessageBoxImage.Warning);

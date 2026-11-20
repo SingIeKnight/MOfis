@@ -125,7 +125,12 @@ public sealed class RecoveryEntry
     public DateTime SavedAt { get; set; }
     public int ProcessId { get; set; }
 
-    public string DocPath => Path.Combine(AppInfo.RecoveryDir, Id + ".docx");
+    /// "writer" (Yazi, .docx) veya "sheet" (Hesap, .xlsx). Eski kayitlarda alan yoksa Yazi kabul edilir.
+    public string Kind { get; set; } = "writer";
+
+    public bool IsSheet => Kind == "sheet";
+
+    public string DocPath => Path.Combine(AppInfo.RecoveryDir, Id + (IsSheet ? ".xlsx" : ".docx"));
 }
 
 /// Kaydedilmemis degisikliklerin birkac dakikada bir alinan kopyalari. Pencere duzgun kapaninca silinir;
@@ -144,6 +149,23 @@ public static class AutoRecovery
         catch
         {
             // Kurtarma kopyasi alinamazsa kullaniciyi rahatsiz etme; bir sonraki denemede tekrar denenir.
+        }
+    }
+
+    /// Hesap tablosunun kurtarma kopyasi.
+    public static void SaveSheet(RecoveryEntry entry, ClosedXML.Excel.XLWorkbook wb)
+    {
+        try
+        {
+            entry.Kind = "sheet";
+            entry.SavedAt = DateTime.Now;
+            entry.ProcessId = Environment.ProcessId;
+            MOfis.Sheet.SheetIO.Save(wb, entry.DocPath, 0);
+            File.WriteAllText(Path.Combine(AppInfo.RecoveryDir, entry.Id + ".json"), JsonSerializer.Serialize(entry));
+        }
+        catch
+        {
+            // Kurtarma kopyasi alinamazsa kullaniciyi rahatsiz etme.
         }
     }
 
@@ -169,7 +191,7 @@ public static class AutoRecovery
 
     public static void Delete(string id)
     {
-        foreach (var ext in new[] { ".docx", ".json" })
+        foreach (var ext in new[] { ".docx", ".xlsx", ".json" })
         {
             try { File.Delete(Path.Combine(AppInfo.RecoveryDir, id + ext)); } catch { }
         }

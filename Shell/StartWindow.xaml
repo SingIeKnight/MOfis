@@ -62,12 +62,12 @@
                             <TextBlock Text="Boş belge" Margin="2,8,0,0"/>
                         </StackPanel>
                     </Button>
-                    <Button Style="{StaticResource TileButton}" Padding="10" IsEnabled="False" ToolTip="Hesap tablosu bir sonraki sürümde geliyor">
+                    <Button Style="{StaticResource TileButton}" Padding="10" Click="NewSheet_Click" ToolTip="Boş bir hesap tablosu oluştur">
                         <StackPanel>
                             <Border Width="128" Height="164" Background="White" BorderBrush="#D6D7DE" BorderThickness="1" CornerRadius="3" ClipToBounds="True">
                                 <Grid x:Name="SheetThumb" Margin="8,14,8,8"/>
                             </Border>
-                            <TextBlock Text="Boş tablo (yakında)" Margin="2,8,0,0"/>
+                            <TextBlock Text="Boş tablo" Margin="2,8,0,0"/>
                         </StackPanel>
                     </Button>
                 </WrapPanel>

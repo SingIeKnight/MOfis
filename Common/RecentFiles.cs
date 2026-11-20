@@ -31,8 +31,12 @@ public static class RecentFiles
         }
     }
 
+    /// Gelistirme araci (--shot) calisirken listeye dokunulmaz.
+    public static bool Disabled { get; set; }
+
     public static void Add(string path)
     {
+        if (Disabled) return;
         var list = Load();
         list.RemoveAll(r => string.Equals(r.Path, path, StringComparison.OrdinalIgnoreCase));
         list.Insert(0, new RecentFile { Path = path, LastOpened = DateTime.Now });
