@@ -1,0 +1,242 @@
+<Window x:Class="MOfis.Writer.WriterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MOfis.Writer"
+        Title="MOfis Yazı" Width="1240" Height="820" MinWidth="720" MinHeight="420"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="{StaticResource UiFont}" FontSize="12.5"
+        Foreground="{StaticResource TextBrush}" Background="{StaticResource CanvasBg}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ============================== Serit ============================== -->
+        <TabControl x:Name="Ribbon" Style="{StaticResource RibbonTabs}" Focusable="False">
+            <TabControl.Tag>
+                <StackPanel Orientation="Horizontal" Margin="6,3,0,3">
+                    <Button x:Name="FileButton" Style="{StaticResource AccentButton}" Content="Dosya" Padding="16,4" Click="FileButton_Click" Focusable="False"/>
+                    <Button Style="{StaticResource RibbonSmall}" Tag="&#xE74E;" ToolTip="Kaydet (Ctrl+S)" Click="Save_Click" Margin="6,0,0,0" Focusable="False"/>
+                    <Button Style="{StaticResource RibbonSmall}" Tag="&#xE7A7;" ToolTip="Geri al (Ctrl+Z)" Command="ApplicationCommands.Undo" CommandTarget="{Binding ElementName=Editor}" Focusable="False"/>
+                    <Button Style="{StaticResource RibbonSmall}" Tag="&#xE7A6;" ToolTip="Yinele (Ctrl+Y)" Command="ApplicationCommands.Redo" CommandTarget="{Binding ElementName=Editor}" Focusable="False"/>
+                </StackPanel>
+            </TabControl.Tag>
+
+            <!-- Giris -->
+            <TabItem Header="Giriş" Style="{StaticResource RibbonTab}">
+                <StackPanel Orientation="Horizontal">
+                    <HeaderedContentControl Header="Pano" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonLarge}" Tag="&#xE77F;" Content="Yapıştır" ToolTip="Yapıştır (Ctrl+V)"
+                                    Command="ApplicationCommands.Paste" CommandTarget="{Binding ElementName=Editor}" Focusable="False"/>
+                            <StackPanel VerticalAlignment="Center">
+                                <Button Style="{StaticResource RibbonSmall}" Tag="&#xE8C6;" Content="Kes" ToolTip="Kes (Ctrl+X)" HorizontalAlignment="Left"
+                                        Command="ApplicationCommands.Cut" CommandTarget="{Binding ElementName=Editor}" Focusable="False"/>
+                                <Button Style="{StaticResource RibbonSmall}" Tag="&#xE8C8;" Content="Kopyala" ToolTip="Kopyala (Ctrl+C)" HorizontalAlignment="Left"
+                                        Command="ApplicationCommands.Copy" CommandTarget="{Binding ElementName=Editor}" Focusable="False"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </HeaderedContentControl>
+
+                    <HeaderedContentControl Header="Yazı Tipi" Style="{StaticResource RibbonGroup}">
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <ComboBox x:Name="FontBox" Width="150" Height="24" IsEditable="True" IsTextSearchEnabled="True" ToolTip="Yazı tipi"
+                                          VirtualizingPanel.IsVirtualizing="True">
+                                    <ComboBox.ItemsPanel>
+                                        <ItemsPanelTemplate><VirtualizingStackPanel/></ItemsPanelTemplate>
+                                    </ComboBox.ItemsPanel>
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontFamily="{Binding}" FontSize="14"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <ComboBox x:Name="SizeBox" Width="58" Height="24" IsEditable="True" Margin="4,0,2,0" ToolTip="Yazı tipi boyutu"/>
+                                <Button Style="{StaticResource RibbonSmall}" Tag="&#xE8E8;" ToolTip="Yazı tipini büyüt (Ctrl+])" Click="Grow_Click" Focusable="False"/>
+                                <Button Style="{StaticResource RibbonSmall}" Tag="&#xE8E7;" ToolTip="Yazı tipini küçült (Ctrl+[)" Click="Shrink_Click" Focusable="False"/>
+                                <Button Style="{StaticResource RibbonSmall}" Tag="&#xE75C;" ToolTip="Tüm biçimlendirmeyi temizle" Click="ClearFormat_Click" Focusable="False"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <ToggleButton x:Name="BoldBtn" Style="{StaticResource RibbonToggle}" ToolTip="Kalın (Ctrl+B)" Click="Bold_Click" Focusable="False">
+                                    <TextBlock Text="K" FontWeight="Bold" FontFamily="Georgia"/>
+                                </ToggleButton>
+                                <ToggleButton x:Name="ItalicBtn" Style="{StaticResource RibbonToggle}" ToolTip="İtalik (Ctrl+I)" Click="Italic_Click" Focusable="False">
+                                    <TextBlock Text="T" FontStyle="Italic" FontFamily="Georgia"/>
+                                </ToggleButton>
+                                <ToggleButton x:Name="UnderlineBtn" Style="{StaticResource RibbonToggle}" ToolTip="Altı çizili (Ctrl+U)" Click="Underline_Click" Focusable="False">
+                                    <TextBlock Text="A" TextDecorations="Underline" FontFamily="Georgia"/>
+                                </ToggleButton>
+                                <ToggleButton x:Name="StrikeBtn" Style="{StaticResource RibbonToggle}" ToolTip="Üstü çizili" Click="Strike_Click" Focusable="False">
+                                    <TextBlock Text="ab" TextDecorations="Strikethrough" FontFamily="Georgia" FontSize="13"/>
+                                </ToggleButton>
+                                <ToggleButton x:Name="SubBtn" Style="{StaticResource RibbonToggle}" ToolTip="Alt simge (Ctrl+=)" Click="Subscript_Click" Focusable="False">
+                                    <TextBlock FontFamily="Georgia" FontSize="13">x<Run Text="2" FontSize="8" BaselineAlignment="Subscript"/></TextBlock>
+                                </ToggleButton>
+                                <ToggleButton x:Name="SupBtn" Style="{StaticResource RibbonToggle}" ToolTip="Üst simge (Ctrl+Shift+=)" Click="Superscript_Click" Focusable="False">
+                                    <TextBlock FontFamily="Georgia" FontSize="13">x<Run Text="2" FontSize="8" BaselineAlignment="Superscript"/></TextBlock>
+                                </ToggleButton>
+                                <Border Width="1" Background="{StaticResource LineBrush}" Margin="4,3"/>
+                                <Button x:Name="HighlightBtn" Style="{StaticResource RibbonSmall}" ToolTip="Metin vurgu rengi" Click="Highlight_Click" Focusable="False">
+                                    <StackPanel>
+                                        <TextBlock Text="&#xE7E6;" FontFamily="{StaticResource IconFont}" FontSize="14" HorizontalAlignment="Center"/>
+                                        <Border x:Name="HighlightBar" Height="3" Width="16" Background="Yellow" Margin="0,1,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button x:Name="FontColorBtn" Style="{StaticResource RibbonSmall}" ToolTip="Yazı tipi rengi" Click="FontColor_Click" Focusable="False">
+                                    <StackPanel>
+                                        <TextBlock Text="A" FontFamily="Georgia" FontSize="14" HorizontalAlignment="Center" Margin="0,-2,0,0"/>
+                                        <Border x:Name="FontColorBar" Height="3" Width="16" Background="#C00000"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </HeaderedContentControl>
+
+                    <HeaderedContentControl Header="Paragraf" Style="{StaticResource RibbonGroup}">
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Button x:Name="BulletsBtn" Style="{StaticResource RibbonSmall}" ToolTip="Madde işaretleri" Click="Bullets_Click" Focusable="False"/>
+                                <Button x:Name="NumbersBtn" Style="{StaticResource RibbonSmall}" ToolTip="Numaralandırma" Click="Numbers_Click" Focusable="False"/>
+                                <Button Style="{StaticResource RibbonSmall}" Tag="&#xE290;" ToolTip="Girintiyi azalt" Click="Outdent_Click" Focusable="False"/>
+                                <Button Style="{StaticResource RibbonSmall}" Tag="&#xE291;" ToolTip="Girintiyi artır" Click="Indent_Click" Focusable="False"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <ToggleButton x:Name="AlignLeftBtn" Style="{StaticResource RibbonToggle}" ToolTip="Sola hizala (Ctrl+L)" Click="AlignLeft_Click" Focusable="False"/>
+                                <ToggleButton x:Name="AlignCenterBtn" Style="{StaticResource RibbonToggle}" ToolTip="Ortala (Ctrl+E)" Click="AlignCenter_Click" Focusable="False"/>
+                                <ToggleButton x:Name="AlignRightBtn" Style="{StaticResource RibbonToggle}" ToolTip="Sağa hizala (Ctrl+R)" Click="AlignRight_Click" Focusable="False"/>
+                                <ToggleButton x:Name="AlignJustifyBtn" Style="{StaticResource RibbonToggle}" ToolTip="İki yana yasla (Ctrl+J)" Click="AlignJustify_Click" Focusable="False"/>
+                                <Button x:Name="LineSpacingBtn" Style="{StaticResource RibbonSmall}" ToolTip="Satır aralığı" Click="LineSpacing_Click" Focusable="False"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </HeaderedContentControl>
+
+                    <HeaderedContentControl Header="Stiller" Style="{StaticResource RibbonGroup}">
+                        <StackPanel x:Name="StyleGallery" Orientation="Horizontal" VerticalAlignment="Center"/>
+                    </HeaderedContentControl>
+
+                    <HeaderedContentControl Header="Düzenleme" Style="{StaticResource RibbonGroup}">
+                        <StackPanel VerticalAlignment="Center">
+                            <Button Style="{StaticResource RibbonSmall}" Tag="&#xE721;" Content="Bul" ToolTip="Bul (Ctrl+F)" HorizontalAlignment="Left" Click="Find_Click" Focusable="False"/>
+                            <Button Style="{StaticResource RibbonSmall}" Tag="&#xE8AB;" Content="Değiştir" ToolTip="Değiştir (Ctrl+H)" HorizontalAlignment="Left" Click="Replace_Click" Focusable="False"/>
+                            <Button Style="{StaticResource RibbonSmall}" Tag="&#xE8B3;" Content="Tümünü seç" ToolTip="Tümünü seç (Ctrl+A)" HorizontalAlignment="Left"
+                                    Command="ApplicationCommands.SelectAll" CommandTarget="{Binding ElementName=Editor}" Focusable="False"/>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Ekle -->
+            <TabItem Header="Ekle" Style="{StaticResource RibbonTab}">
+                <StackPanel Orientation="Horizontal">
+                    <HeaderedContentControl Header="Tablolar" Style="{StaticResource RibbonGroup}">
+                        <Button x:Name="TableBtn" Style="{StaticResource RibbonLarge}" Tag="&#xE80A;" Content="Tablo" ToolTip="Tablo ekle" Click="InsertTable_Click" Focusable="False"/>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Çizimler" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonLarge}" Tag="&#xEB9F;" Content="Resim" ToolTip="Bilgisayardan resim ekle" Click="InsertImage_Click" Focusable="False"/>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Bağlantılar" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonLarge}" Tag="&#xE71B;" Content="Bağlantı" ToolTip="Bağlantı ekle (Ctrl+K)" Click="InsertLink_Click" Focusable="False"/>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Sayfalar" Style="{StaticResource RibbonGroup}">
+                        <Button Style="{StaticResource RibbonLarge}" Tag="&#xE7C3;" Content="Sayfa Sonu" ToolTip="Sayfa sonu ekle (Ctrl+Enter)" Click="PageBreak_Click" Focusable="False"/>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Duzen -->
+            <TabItem Header="Düzen" Style="{StaticResource RibbonTab}">
+                <StackPanel Orientation="Horizontal">
+                    <HeaderedContentControl Header="Sayfa Yapısı" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="MarginsBtn" Style="{StaticResource RibbonLarge}" Tag="&#xE9A6;" Content="Kenar&#x0a;Boşlukları" Click="Margins_Click" Focusable="False"/>
+                            <Button x:Name="OrientationBtn" Style="{StaticResource RibbonLarge}" Tag="&#xE8B4;" Content="Yönlendirme" Click="Orientation_Click" Focusable="False"/>
+                            <Button x:Name="SizeBtn" Style="{StaticResource RibbonLarge}" Tag="&#xE7C3;" Content="Boyut" Click="PageSize_Click" Focusable="False"/>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Gorunum -->
+            <TabItem Header="Görünüm" Style="{StaticResource RibbonTab}">
+                <StackPanel Orientation="Horizontal">
+                    <HeaderedContentControl Header="Yakınlaştır" Style="{StaticResource RibbonGroup}">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Style="{StaticResource RibbonLarge}" Tag="&#xE71E;" Content="%100" ToolTip="Gerçek boyut" Click="Zoom100_Click" Focusable="False"/>
+                            <Button Style="{StaticResource RibbonLarge}" Tag="&#xE9A6;" Content="Sayfa&#x0a;genişliği" Click="ZoomWidth_Click" Focusable="False"/>
+                            <StackPanel VerticalAlignment="Center">
+                                <Button Style="{StaticResource RibbonSmall}" Tag="&#xE8A3;" Content="Yakınlaştır" HorizontalAlignment="Left" Click="ZoomIn_Click" Focusable="False"/>
+                                <Button Style="{StaticResource RibbonSmall}" Tag="&#xE71F;" Content="Uzaklaştır" HorizontalAlignment="Left" Click="ZoomOut_Click" Focusable="False"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </HeaderedContentControl>
+                    <HeaderedContentControl Header="Göster" Style="{StaticResource RibbonGroup}">
+                        <CheckBox x:Name="RulerCheck" Content="Cetvel" IsChecked="True" VerticalAlignment="Center" Margin="4,0"
+                                  Focusable="False" Click="RulerCheck_Click"/>
+                    </HeaderedContentControl>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+
+        <!-- ============================== Bilgi cubugu ============================== -->
+        <Border x:Name="InfoBar" Grid.Row="1" Background="{StaticResource InfoBarBg}" BorderBrush="{StaticResource InfoBarLine}" BorderThickness="0,0,0,1" Visibility="Collapsed">
+            <DockPanel Margin="12,6">
+                <Button DockPanel.Dock="Right" Style="{StaticResource RibbonSmall}" Tag="&#xE711;" ToolTip="Kapat" Click="CloseInfo_Click" Focusable="False"/>
+                <TextBlock Text="&#xE7BA;" FontFamily="{StaticResource IconFont}" FontSize="15" VerticalAlignment="Center" Foreground="#9A6700"/>
+                <TextBlock x:Name="InfoText" Margin="10,0,0,0" VerticalAlignment="Center" TextWrapping="Wrap"/>
+            </DockPanel>
+        </Border>
+
+        <!-- ============================== Sayfa + cetveller ============================== -->
+        <Grid Grid.Row="2" Background="{StaticResource CanvasBg}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border x:Name="RulerCorner" Background="{StaticResource StatusBg}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,1,1"/>
+            <local:Ruler x:Name="HRuler" Grid.Column="1"/>
+            <local:Ruler x:Name="VRuler" Grid.Row="1" Vertical="True"/>
+        <ScrollViewer x:Name="Scroller" Grid.Row="1" Grid.Column="1" Background="{StaticResource CanvasBg}" Focusable="False"
+                      HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <Grid x:Name="PageHost" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="24,24,24,48">
+                <Grid.LayoutTransform>
+                    <ScaleTransform x:Name="ZoomTransform" ScaleX="1" ScaleY="1"/>
+                </Grid.LayoutTransform>
+                <!-- Golge ayri bir katmanda: efekt metnin oldugu katmana konursa yazilar bulaniklasir. -->
+                <Border Background="White" CornerRadius="1">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="12" ShadowDepth="1" Direction="270" Opacity="0.16"/>
+                    </Border.Effect>
+                </Border>
+                <RichTextBox x:Name="Editor" BorderThickness="0" Background="White" Foreground="Black"
+                             AcceptsTab="True" AcceptsReturn="True" IsDocumentEnabled="True"
+                             SpellCheck.IsEnabled="True" Language="tr-TR"
+                             VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled"
+                             FocusVisualStyle="{x:Null}" SelectionBrush="#4338CA"/>
+            </Grid>
+        </ScrollViewer>
+            <!-- Cetvelde girinti surukleme sirasinda gorunen kesikli kilavuz cizgisi -->
+            <Canvas x:Name="GuideLayer" Grid.Row="1" Grid.Column="1" IsHitTestVisible="False">
+                <Line x:Name="GuideLine" Stroke="#4B505A" StrokeThickness="1" StrokeDashArray="3 3" Visibility="Collapsed"/>
+            </Canvas>
+        </Grid>
+
+        <!-- ============================== Durum cubugu ============================== -->
+        <Border Grid.Row="3" Background="{StaticResource StatusBg}" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0">
+            <DockPanel Margin="10,3" LastChildFill="False">
+                <TextBlock x:Name="WordCountText" VerticalAlignment="Center" Foreground="{StaticResource SubtleTextBrush}" FontSize="12"/>
+                <TextBlock Text="Türkçe" Margin="18,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource SubtleTextBrush}" FontSize="12"/>
+                <TextBlock x:Name="ZoomText" DockPanel.Dock="Right" Width="44" TextAlignment="Right" VerticalAlignment="Center" FontSize="12" Foreground="{StaticResource SubtleTextBrush}"/>
+                <Slider x:Name="ZoomSlider" DockPanel.Dock="Right" Width="130" Minimum="25" Maximum="300" Value="100" VerticalAlignment="Center"
+                        IsMoveToPointEnabled="True" Focusable="False" ToolTip="Yakınlaştırma"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,33 @@
+# Her push'ta GitHub'in Windows sunucusunda temiz bir kopyadan derler ve testleri calistirir.
+name: Derleme
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  derle:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Derle
+        run: dotnet build MOfis.csproj -c Release -nologo
+
+      - name: Testler
+        run: dotnet test Tests/MOfis.Tests.csproj -c Release -nologo --logger "console;verbosity=normal"

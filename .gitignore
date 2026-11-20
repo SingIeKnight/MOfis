@@ -1,0 +1,10 @@
+bin/
+obj/
+Tests/bin/
+Tests/obj/
+TestResults/
+dist/
+*.user
+*.suo
+.vs/
+*.mofis-tmp
